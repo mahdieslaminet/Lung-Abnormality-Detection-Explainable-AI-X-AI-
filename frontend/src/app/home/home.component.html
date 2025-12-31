@@ -47,7 +47,7 @@
         </div>
 
         <div class="diagnosis-info" [class.danger]="prediction.prediction_class !== 'Normal'" [class.success]="prediction.prediction_class === 'Normal'">
-          <h2>تشخیص: {{ prediction.prediction_class }}</h2>
+          <h2>تشخیص: {{ getPersianLabel(prediction.prediction_class) }}</h2>
           <div class="confidence-bar">
             <span>اطمینان: {{ (prediction.confidence * 100) | number:'1.1-2' }}%</span>
             <div class="progress">
@@ -62,5 +62,73 @@
       </div>
     </div>
 
+
+    <!-- Dataset Section -->
+    <div class="card dataset-card" *ngIf="!prediction" @fadeIn>
+      <h2>بارگذاری دیتاست از Kaggle</h2>
+      <div class="dataset-input-group">
+        <input type="text" [(ngModel)]="datasetHandle" placeholder="مثال: luisblanche/covidct" class="dataset-input">
+        <div class="btn-group">
+          <button class="btn btn-primary" (click)="loadDataset()" [disabled]="datasetLoading">
+            <span *ngIf="!datasetLoading">بارگذاری دیتاست (API) 📥</span>
+            <span *ngIf="datasetLoading" class="loader"></span>
+          </button>
+          <button class="btn btn-secondary" (click)="loadMockDataset()" [disabled]="datasetLoading">
+            <span>بارگذاری نمونه (Mock) 🧪</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="error" *ngIf="datasetError">{{ datasetError }}</div>
+
+      <div class="dataset-preview" *ngIf="datasetPreview">
+        <h3>پیش‌نمایش دیتاست</h3>
+        <p>تعداد سطر و ستون: {{ datasetPreview.shape }}</p>
+        
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th *ngFor="let col of datasetPreview.columns">{{ col }}</th>
+                <th>عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of paginatedRows">
+                <td *ngFor="let col of datasetPreview.columns">{{ row[col] }}</td>
+                <td>
+                  <button *ngIf="row['Type'] === '.png' || row['Type'] === '.jpg' || row['Type'] === '.jpeg'" 
+                          class="btn btn-sm btn-outline" 
+                          (click)="analyzeDatasetImage(row['Path'])">
+                    تحلیل ⚡
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls" *ngIf="totalPages > 1">
+          <button class="btn btn-sm btn-secondary" 
+                  (click)="changePage(currentPage - 1)" 
+                  [disabled]="currentPage === 1">
+            قبلی
+          </button>
+          
+          <span class="page-info">
+            صفحه {{ currentPage }} از {{ totalPages }}
+          </span>
+          
+          <button class="btn btn-sm btn-secondary" 
+                  (click)="changePage(currentPage + 1)" 
+                  [disabled]="currentPage === totalPages">
+            بعدی
+          </button>
+        </div>
+      </div>
+    </div>
+
   </main>
+
 </div>

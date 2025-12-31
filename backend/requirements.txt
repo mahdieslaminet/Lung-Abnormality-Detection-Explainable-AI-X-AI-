@@ -8,3 +8,5 @@ opencv-python
 python-multipart
 scikit-learn
 matplotlib
+kagglehub
+pandas

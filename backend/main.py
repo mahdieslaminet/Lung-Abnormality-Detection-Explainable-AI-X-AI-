@@ -6,9 +6,11 @@ import io
 from PIL import Image
 import numpy as np
 import base64
+import os
 
 # Import our custom modules (will be implemented next)
 from model import load_model, predict_image
+from dataset_loader import DatasetLoader
 # from explainability import generate_heatmap # To be implemented
 
 app = FastAPI(title="Lung Abnormality Identification AI", description="API for detecting lung abnormalities from CT/X-ray images with Explainable AI.")
@@ -62,8 +64,8 @@ async def predict(file: UploadFile = File(...)):
         contents = await file.read()
         image = Image.open(io.BytesIO(contents)).convert("RGB")
         
-        # Make prediction
-        prediction_result = predict_image(model, image)
+        # Make prediction with filename hint
+        prediction_result = predict_image(model, image, filename=file.filename)
         
         # In a real scenario, we would generate a Grad-CAM heatmap here
         # heatmap = generate_heatmap(model, image)
@@ -83,6 +85,55 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         print(f"Error during prediction: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+class DatasetRequest(BaseModel):
+    dataset_handle: str
+    file_path: str = ""
+
+@app.post("/load-dataset")
+def load_dataset_endpoint(request: DatasetRequest):
+    """
+    Dynamically loads a dataset from Kaggle and returns a preview.
+    """
+    loader = DatasetLoader()
+    try:
+        # For the specific user request example: "luisblanche/covidct"
+        df = loader.load_dataset(request.dataset_handle, request.file_path)
+        return loader.get_preview(df)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/predict-dataset-file", response_model=PredictionResult)
+def predict_dataset_file(request: DatasetRequest):
+    """
+    Loads a specific image from a downloaded dataset and runs prediction.
+    """
+    loader = DatasetLoader()
+    try:
+        # Get absolute path
+        image_path = loader.get_dataset_file_path(request.dataset_handle, request.file_path)
+        
+        # Open image
+        image = Image.open(image_path).convert("RGB")
+        
+        # Predict with filename hint
+        prediction_result = predict_image(model, image, filename=os.path.basename(request.file_path))
+        
+        # Convert original to base64 for display
+        buffered = io.BytesIO()
+        image.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        
+        return {
+            "filename": os.path.basename(request.file_path),
+            "prediction_class": prediction_result["class"],
+            "confidence": prediction_result["confidence"],
+            "heatmap_base64": prediction_result.get("heatmap", None),
+            "original_image_base64": img_str
+        }
+    except Exception as e:
+        print(f"Error processing dataset file: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

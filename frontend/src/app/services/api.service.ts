@@ -27,4 +27,15 @@ export class ApiService {
   checkHealth(): Observable<any> {
     return this.http.get(`${this.baseUrl}/health`);
   }
+
+  loadDataset(datasetHandle: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/load-dataset`, { dataset_handle: datasetHandle });
+  }
+
+  predictDatasetImage(datasetHandle: string, filePath: string): Observable<PredictionResult> {
+    return this.http.post<PredictionResult>(`${this.baseUrl}/predict-dataset-file`, { 
+      dataset_handle: datasetHandle,
+      file_path: filePath
+    });
+  }
 }
