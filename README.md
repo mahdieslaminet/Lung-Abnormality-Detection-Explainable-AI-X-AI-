@@ -16,17 +16,19 @@
 
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Xzz5FpGWSjmrhs4SZ5il6pPjG7j6Lde2)
 
+لینک ویدئو پروژه:
+
+https://drive.google.com/file/d/1JL_VCSdLnHcAvryqaVWtHshl8dgarNyP/view?usp=sharing
+
+لینک تمامی مقالات ترجمه شده:
+
+https://drive.google.com/drive/folders/1rEntzwlWhUuuqayZyzIAZXtBLv-EBxH6?usp=drive_link
+
 تصاویری از پروژه
 
 ![](screencapture-localhost-4200-2026-01-29-11_41_18.png)
 
 ![](screencapture-localhost-4200-2026-01-29-11_41_46.png)
-
-لینک ویدئو پروژه:
-https://drive.google.com/file/d/1JL_VCSdLnHcAvryqaVWtHshl8dgarNyP/view?usp=sharing
-
-لینک تمامی مقالات ترجمه شده:
-https://drive.google.com/drive/folders/1rEntzwlWhUuuqayZyzIAZXtBLv-EBxH6?usp=drive_link
 
 ### 💻 رابط کاربری (Frontend)
 
